@@ -1,0 +1,72 @@
+//BASIT ABDUL
+#include <DS3232RTC.h>    //Get library here http://github.com/JChristensen/DS3232RTC
+#include <time.h> 
+#include <Wire.h>
+
+int val ; 
+
+void setup() 
+{
+  Serial.begin(9600);
+  pinMode(7, OUTPUT); //relay1
+
+  /////////Uncomment both lines below when you want to set the time
+  /////////AFTER SETTING TIME COMMENT the lines.
+  setTime(17, 59, 45, 20, 10, 2017);//Hours / minutes / second / day of month / month / year
+  RTC.set(now());
+  
+  setSyncProvider(RTC.get);   // the function to get the time from the RTC
+    if(timeStatus() != timeSet) 
+        Serial.println("Unable to sync with the RTC");
+    else
+       Serial.println("RTC has set the system time");   
+}
+ 
+void loop() 
+{
+digitalClockDisplay();
+AutomaticProgram(); 
+
+}
+ 
+
+void AutomaticProgram() 
+{   //we are using hour as a value the rest is ignored.
+    val = (hour()); //Grow/Day - Groei/Dag between 4:00 and 22:00
+    if ((17 == val))             
+    {
+    digitalWrite(7, HIGH);
+    }
+    else if (val == 18)
+    {
+    digitalWrite(7, LOW);
+    }
+    else
+    {
+    digitalWrite(7, LOW);
+    }
+}
+
+void digitalClockDisplay(void)
+{
+    // digital clock display of the time
+    Serial.print(hour());
+    printDigits(minute());
+    printDigits(second());
+   // Serial.print(' ');
+   // Serial.print(day());
+   // Serial.print(' ');
+   // Serial.print(month());
+   // Serial.print(' ');
+    //Serial.print(year()); 
+    Serial.println(); 
+}
+
+void printDigits(int digits)
+{
+    // utility function for digital clock display: prints preceding colon and leading 0
+    Serial.print(':');
+    if(digits < 10)
+        Serial.print('0');
+    Serial.print(digits);
+}
